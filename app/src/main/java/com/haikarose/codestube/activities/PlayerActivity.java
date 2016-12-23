@@ -1,12 +1,13 @@
-package com.haikarose.codestube;
+package com.haikarose.codestube.activities;
 import android.os.Bundle;
 
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
+import com.haikarose.codestube.R;
 
-public class SecondActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener{
+public class PlayerActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener{
 
     public static final String apiKey="AIzaSyAw3aNdtOIHH-MX2D-WF9ZGpb6Lr_aU34A";
     public static final String id="0kvf-L2fero";

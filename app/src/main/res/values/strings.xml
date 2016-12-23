@@ -3,4 +3,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="copyrights">\u00a9 2016 Haikarose lab</string>
+    <string name="about_message">CodeTube is the proud product of Haikarose software laboratory.</string>
+    <string name="version_title">version 1.0</string>
+    <string name="about_menu">About</string>
+    <string name="email">codetube@gmail.com</string>
 </resources>
