@@ -22,9 +22,10 @@ import com.google.android.gms.ads.NativeExpressAdView;
 import com.haikarose.codestube.R;
 import com.haikarose.codestube.adapters.CategoryItemAdapter;
 import com.haikarose.codestube.pojos.Category;
+import com.haikarose.codestube.tools.EndlessRecyclerViewScrollListener;
+
 import java.util.ArrayList;
 import java.util.List;
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -33,6 +34,8 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
+    private CategoryItemAdapter adapter;
+    private int lastAdPosition=0;
 
     public Home() {
         // Required empty public constructor
@@ -64,50 +67,42 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
         swipeRefreshLayout=(SwipeRefreshLayout)view.findViewById(R.id.swipeRefresh);
         recyclerView=(RecyclerView)view.findViewById(R.id.recyclerView);
 
+
         LinearLayoutManager manager=new LinearLayoutManager(getContext());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
 
-        List<Object> categories=new ArrayList<>();
+        final List<Object> categories=new ArrayList<>();
 
-        for(int i=0;i<11;i++){
-            if(i%2==0){
-                Category category=new Category("Java",
-                        "Java programming language is the best Java programming " +
-                                "language is the best Java programming language is the best " +
-                                "Java programming language is the best Java programming language " +
-                                "is the bestJava programming language is the best","21 dec 2016");
-                categories.add(category);
-            }else if(i%3==0){
-                Category category=new Category("System Analysis and Design",
-                        "Java programming language is the best Java programming " +
-                                "language is the best Java programming language is the best " +
-                                "Java programming language is the best Java programming language " +
-                                "is the bestJava programming language is the best","21 dec 2016");
-                categories.add(category);
-            }else{
-                Category category=new Category("Operating System",
-                        "Java programming language is the best Java programming " +
-                                "language is the best Java programming language is the best " +
-                                "Java programming language is the best Java programming language " +
-                                "is the bestJava programming language is the best","21 dec 2016");
-                categories.add(category);
+        //page//total//count/list
+        loadData(0,0,categories);
+
+
+
+
+
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(manager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+
+                    Toast.makeText(getContext(),Integer.toString(page)+":"+Integer.toString(totalItemsCount),Toast.LENGTH_SHORT).show();
+                    loadData(page,totalItemsCount,categories);
+                    adapter.notifyDataSetChanged();
+                    Toast.makeText(getContext(),"am here",Toast.LENGTH_SHORT).show();
 
             }
+        });
 
-        }
 
-        //adding the ads to the category list.
-        addNativeAddToList(categories);
 
-        CategoryItemAdapter adapter=new CategoryItemAdapter(getContext(),fragmentManager,categories);
+        adapter=new CategoryItemAdapter(getContext(),fragmentManager,categories);
         recyclerView.setAdapter(adapter);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Toast.makeText(getContext(),"someone pull up",Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                //loadData(0,8,categories);
+
             }
         });
 
@@ -115,28 +110,6 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-
-
-
-       /* TextView text=(TextView)view.findViewById(R.id.text);
-
-        text.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-
-                TimePickerDialog dialog =  new TimePickerDialog(
-                        getActivity(),R.style.DialogTheme,
-                        timeSetListener,
-                        05,
-                        12,
-                        true);
-                dialog.show();
-
-               *//*TimePickerFragment fragment=new TimePickerFragment();
-                fragment.show(getFragmentManager(),"show");*//*
-
-            }
-        });*/
 
         return view;
     }
@@ -151,35 +124,73 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
     }
 
-    public void addNativeAddToList(final List<Object> objects){
-        for(int i=0; i<objects.size();i+=8){
+    public void addNativeAddToList(int on, final List<Object> objects){
+
+
+
+
                 NativeExpressAdView nativeExpressAdView=new NativeExpressAdView(getContext());
                 nativeExpressAdView.setAdUnitId("ca-app-pub-3940256099942544/1072772517");
-                objects.add(i,nativeExpressAdView);
 
 
-        }
+                lastAdPosition=on+7;
+                ////////////-------------------------////////////////////////////////
+            if(on==0){
+                AdSize size=new AdSize(300,150);
+                objects.add(on,nativeExpressAdView);
 
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                final float density=getActivity().getResources().getDisplayMetrics().density;
-
-                int width=(int)(recyclerView.getWidth()/density);
-                if(width>=600){
-                    width=500;
-                }
-                AdSize size=new AdSize(width,150);
-                Toast.makeText(getContext(),Float.toString(recyclerView.getWidth()/density),Toast.LENGTH_SHORT).show();
-
-                for(int i=0; i<objects.size();i+=8){
-                    NativeExpressAdView nativeExpressAdView=(NativeExpressAdView)objects.get(i);
-                    nativeExpressAdView.setAdSize(size);
+                try{
+                    //NativeExpressAdView nativeExpressAdView=(NativeExpressAdView)objects.get(on);
+                    if(nativeExpressAdView.getAdSize()==null){
+                        nativeExpressAdView.setAdSize(size);
+                    }
                     nativeExpressAdView.loadAd(new AdRequest.Builder().build());
+                }catch (Exception ex){
+
                 }
+
+                ////////////-------------------------////////////////////////////////
             }
-        });
+
 
     }
 
+    public void loadData(int page, int total,List<Object> categories){
+
+        swipeRefreshLayout.setRefreshing(true);
+
+        if(page==0){
+
+            for(int i=0;i<7;i++) {
+
+                    Category category = new Category("System Analysis and Design",
+                            "Java programming language is the best Java programming " +
+                                    "language is the best Java programming language is the best " +
+                                    "Java programming language is the best Java programming language " +
+                                    "is the bestJava programming language is the best", "21 dec 2016");
+                    categories.add(category);
+            }
+
+            addNativeAddToList(page,categories);
+
+        }else{
+
+                 int value=total;
+                 for(int i=total;i<value+8;i++){
+                         Category category = new Category("System Analysis and Design",
+                                 "Java programming language is the best Java programming " +
+                                         "language is the best Java programming language is the best " +
+                                         "Java programming language is the best Java programming language " +
+                                         "is the bestJava programming language is the best", "21 dec 2016");
+                         categories.add(category);
+                        }
+
+            addNativeAddToList(total,categories);
+
+        }
+
+
+
+        swipeRefreshLayout.setRefreshing(false);
+    }
 }

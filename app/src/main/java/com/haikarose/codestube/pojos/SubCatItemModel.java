@@ -78,7 +78,7 @@ public class SubCatItemModel {
         return bundle;
     }
 
-    public static SubCatItemModel UpdateItemModelFromBundle(Bundle bundle){
+    public static SubCatItemModel createFromBundle(Bundle bundle){
 
         SubCatItemModel model=new SubCatItemModel();
         model.setId(bundle.getLong(SubCatItemModel.ID));

@@ -1,7 +1,5 @@
 package com.haikarose.codestube.pojos;
-
 import android.support.v4.app.Fragment;
-import android.widget.FrameLayout;
 
 /**
  * Created by root on 12/17/16.

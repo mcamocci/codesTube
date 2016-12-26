@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,22 +62,40 @@ public class CategoryItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         int ViewType=getItemViewType(position);
-        if(ViewType==VIEW_TYPE_NORMAL){
+
+        if(ViewType==0){
             Category category=(Category)categoriyList.get(position);
             CategoryItemViewHolder hold=(CategoryItemViewHolder)holder;
             hold.setData(category);
+
         }else{
             NativeAd nativeAd=(NativeAd)holder;
+            Log.e("the position is: ",Integer.toString(position));
             NativeExpressAdView nativeExpressAdView=(NativeExpressAdView)categoriyList.get(position);
             ViewGroup cardView=(ViewGroup)nativeAd.itemView;
             cardView.removeAllViews();
 
             if(nativeExpressAdView.getParent()!=null){
-                ((ViewGroup)cardView.getParent()).removeView(nativeExpressAdView);
+
+                    try {
+                        ((ViewGroup)cardView.getParent()).removeView(nativeExpressAdView);
+                        //cardView.addView(nativeExpressAdView);
+                    }catch (Exception ex){
+                        Log.e("error caught",ex.getMessage());
+                    }
+
             }
-            cardView.addView(nativeExpressAdView);
+            try {
+                cardView.addView(nativeExpressAdView);
+            }catch (Exception ex){
+                Log.e("error caught2",ex.getMessage());
+                Toast.makeText(context,"yoyo1",Toast.LENGTH_SHORT).show();
+
+            }
 
         }
+
+       
     }
 
     @Override
@@ -143,10 +162,13 @@ public class CategoryItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemViewType(int position) {
-
-        if(position%8==0){
+        try{
+            Category item=(Category)categoriyList.get(position);
+            return 0;
+        }catch (Exception ex){
+            Log.e("the render probs",Integer.toString(position));
+           // Toast.makeText(context,"failed to render at"+Integer.toString(position),Toast.LENGTH_SHORT).show();
             return 1;
         }
-        return 0;
     }
 }

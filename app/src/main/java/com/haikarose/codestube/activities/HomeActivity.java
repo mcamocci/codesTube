@@ -7,14 +7,19 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import com.haikarose.codestube.R;
 import com.haikarose.codestube.adapters.FragmentAdapter;
 import com.haikarose.codestube.fragments.Home;
 import com.haikarose.codestube.pojos.FragmentAndTitle;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +46,21 @@ public class HomeActivity extends AppCompatActivity {
         tabLayout=(TabLayout)findViewById(R.id.sliding_tabs);
         toolbar=(Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        BCryptPasswordEncoder encoder=new BCryptPasswordEncoder();
+
+        String password="hahaha";
+        String hashedPassword1 = encoder.encode(password);
+        String hashedPassword = encoder.encode(password);
+
+        if(encoder.matches(password,hashedPassword1)){
+            Toast.makeText(getBaseContext(),"equal",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(getBaseContext(),"not equal",Toast.LENGTH_SHORT).show();
+        }
+        Log.e("the hashed",hashedPassword);
+
+
        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         fragmentAndTitleCollection=new ArrayList<>();
