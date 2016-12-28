@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,7 @@ import com.google.android.gms.ads.NativeExpressAdView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.haikarose.codestube.R;
-import com.haikarose.codestube.adapters.CategoryItemAdapter;
+import com.haikarose.codestube.adapters.CategoryAdapter;
 import com.haikarose.codestube.pojos.Category;
 import com.haikarose.codestube.tools.CommonInformation;
 import com.haikarose.codestube.tools.EndlessRecyclerViewScrollListener;
@@ -31,9 +30,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
 
-import java.io.File;
 import java.lang.reflect.Type;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +45,7 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
-    private CategoryItemAdapter adapter;
+    private CategoryAdapter adapter;
     private int lastAdPosition=0;
 
     public Home() {
@@ -108,7 +105,7 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
 
 
 
-        adapter=new CategoryItemAdapter(getContext(),fragmentManager,categories);
+        adapter=new CategoryAdapter(getContext(),fragmentManager,categories);
         recyclerView.setAdapter(adapter);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -178,8 +175,7 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
 
                     Category category = new Category();
                     category.setName("System Analysis and Design");
-                    category.setCat_descr("Java programming language is the best Java programming ");
-                    category.setType("Java");
+                    category.setDescription("Java programming language is the best Java programming ");
 
                     categories.add(category);
             }
@@ -192,8 +188,8 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
                  for(int i=total;i<value+8;i++){
                          Category category = new Category();
                          category.setName("System Analysis and Design");
-                         category.setCat_descr("Java programming language is the best Java programming ");
-                         category.setType("Java");
+                         category.setDescription("Java programming language is the best Java programming ");
+
 
                          categories.add(category);
                          categories.add(category);

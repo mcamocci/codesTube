@@ -15,6 +15,8 @@ import com.haikarose.codestube.activities.CategoriesActivity;
 import com.haikarose.codestube.activities.PlayerActivity;
 import com.haikarose.codestube.pojos.Category;
 import com.haikarose.codestube.pojos.PlayableItemModel;
+import com.haikarose.codestube.pojos.Resource;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -65,7 +67,7 @@ public class PlayableItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             promoImage=(ImageView)view.findViewById(R.id.promo_image);
         }
 
-        public void setData(PlayableItemModel itemModel){
+        public void setData(Resource itemModel){
 
             try {
                 ItemViewHolder.this.url = new URL((itemModel.getUrl()));
@@ -73,7 +75,7 @@ public class PlayableItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 e.printStackTrace();
             }
 
-            this.descriptionText.setText(itemModel.getDescription());
+           // this.descriptionText.setText(itemModel.getDescription());
             Glide.with(context).load(url.toString()).centerCrop().placeholder(android.R.drawable.editbox_dropdown_light_frame).into(promoImage);
         }
 
@@ -81,7 +83,7 @@ public class PlayableItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         public void onClick(View v) {
 
             int position=ItemViewHolder.this.getAdapterPosition();
-            PlayableItemModel itemModel=(PlayableItemModel)items.get(position);
+            Resource itemModel=(Resource)items.get(position);
 
             Intent intent=new Intent(context,PlayerActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

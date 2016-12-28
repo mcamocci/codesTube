@@ -2,169 +2,131 @@ package com.haikarose.codestube.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.ads.NativeExpressAdView;
+import com.bumptech.glide.Glide;
 import com.haikarose.codestube.R;
-import com.haikarose.codestube.activities.CategoriesActivity;
-import com.haikarose.codestube.dialogs.MoreOptionDialog;
-import com.haikarose.codestube.pojos.Category;
+import com.haikarose.codestube.activities.ListOfPlayableItemActivity;
+import com.haikarose.codestube.activities.PostsActivity;
+import com.haikarose.codestube.pojos.CategoryItem;
+import com.haikarose.codestube.pojos.SubCatItemModel;
+import com.haikarose.codestube.tools.CommonInformation;
+import com.haikarose.codestube.tools.StringUpperHelper;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
-/**
- * Created by root on 12/21/16.
- */
 
+/**
+ * Created by root on 7/29/16.
+ */
 public class CategoryItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context context;
-    private List<Object> categoriyList;
-    private FragmentManager fragmentManager;
+    List<Object> list;
+    Context context;
 
-    public final static int VIEW_TYPE_NORMAL=0;
-    public final static int VIEW_TYPE_AD=1;
-
-    public CategoryItemAdapter(Context context,FragmentManager fragmentManager, List<Object> categoryList){
+    public CategoryItemAdapter(Context context, List<Object> list){
+        this.list=list;
         this.context=context;
-        this.categoriyList=categoryList;
-        this.fragmentManager=fragmentManager;
-    }
-
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-         View view;
-
-        if(viewType==VIEW_TYPE_AD){
-
-            view= LayoutInflater.from(parent.getContext()).inflate(R.layout.ads_view_item,parent,false);
-            NativeAd holder=new NativeAd(view);
-            return holder;
-
-        }else{
-            view= LayoutInflater.from(parent.getContext()).inflate(R.layout.cat_item,parent,false);
-            CategoryItemViewHolder holder=new CategoryItemViewHolder(view);
-            holder.setFragmentManager(fragmentManager);
-            return holder;
-        }
-
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        int ViewType=getItemViewType(position);
+        CategoryItem currentItem=(CategoryItem)list.get(position);
+        ((NotificationViewHolder)holder).setData(currentItem);
+    }
 
-        if(ViewType==0){
-            Category category=(Category)categoriyList.get(position);
-            CategoryItemViewHolder hold=(CategoryItemViewHolder)holder;
-            hold.setData(category);
-
-        }else{
-            NativeAd nativeAd=(NativeAd)holder;
-            Log.e("the position is: ",Integer.toString(position));
-            NativeExpressAdView nativeExpressAdView=(NativeExpressAdView)categoriyList.get(position);
-            ViewGroup cardView=(ViewGroup)nativeAd.itemView;
-            cardView.removeAllViews();
-
-            if(nativeExpressAdView.getParent()!=null){
-
-                    try {
-                        ((ViewGroup)cardView.getParent()).removeView(nativeExpressAdView);
-                        //cardView.addView(nativeExpressAdView);
-                    }catch (Exception ex){
-                        Log.e("error caught",ex.getMessage());
-                    }
-
-            }
-            try {
-                cardView.addView(nativeExpressAdView);
-            }catch (Exception ex){
-                Log.e("error caught2",ex.getMessage());
-                Toast.makeText(context,"yoyo1",Toast.LENGTH_SHORT).show();
-
-            }
-
-        }
-
-
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cat_sub,parent,false);
+        NotificationViewHolder viewHolder=new NotificationViewHolder(view);
+        return viewHolder;
     }
 
     @Override
     public int getItemCount() {
-        return categoriyList.size();
+        return list.size();
     }
 
-    public  class CategoryItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class NotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        private Category category;
+
+        private Context context;
         private View view;
-        private ImageView moreOption;
-        private FragmentManager fragmentManager;
 
-        public CategoryItemViewHolder(View view){
+        private ImageView promo_image;
+        private TextView time_text_view;
+        private TextView title;
+        private TextView description;
+        private LinearLayout play_button;
+
+
+
+        public NotificationViewHolder(View view){
             super(view);
-            view.setOnClickListener(this);
             this.view=view;
-        }
+            promo_image=(ImageView) view.findViewById(R.id.promo_image);
+            time_text_view=(TextView) view.findViewById(R.id.time);
+            title=(TextView)view.findViewById(R.id.channel_name);
+            description=(TextView)view.findViewById(R.id.message);
+            description.setMovementMethod(LinkMovementMethod.getInstance());
+            play_button=(LinearLayout)view.findViewById(R.id.play_button);
+            play_button.setOnClickListener(this);
 
-        public void setData(Category category){
-            this.category=category;
-
-            TextView title=(TextView)view.findViewById(R.id.title);
-            TextView description=(TextView)view.findViewById(R.id.description);
-            TextView time=(TextView)view.findViewById(R.id.time);
-            moreOption=(ImageView)view.findViewById(R.id.more_menu);
-            moreOption.setOnClickListener(CategoryItemViewHolder.this);
-
-            title.setText(this.category.getName());
-            time.setText(this.category.getName());
-            description.setText(this.category.getCat_descr());
-
-        }
-
-        public void setFragmentManager(FragmentManager fragmentManager){
-            this.fragmentManager=fragmentManager;
+            view.setOnClickListener(this);
+            this.context=view.getContext();
         }
 
         @Override
         public void onClick(View v) {
 
-            int position=CategoryItemViewHolder.this.getAdapterPosition();
-            if(v.getId()==R.id.more_menu){
-                MoreOptionDialog dialog=new MoreOptionDialog();
-                dialog.show(fragmentManager,"tag");
+            int position=NotificationViewHolder.this.getAdapterPosition();
+            CategoryItem item=(CategoryItem) list.get(position);
+            Intent intent=new Intent(NotificationViewHolder.this.context,PostsActivity.class);
+            intent.putExtra(CommonInformation.KEY_CATEGORY,item.getName());
+            context.startActivity(intent);
+
+        }
+
+        public void setData(Object item){
+
+            CategoryItem itemModel=(CategoryItem) item;
+            URL url= null;
+
+            if(((CategoryItem)item).getName().equalsIgnoreCase("springboot")){
+
+                try {
+                    url = new URL(((SubCatItemModel) item).getPromoImage());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+
+                promo_image.setVisibility(View.VISIBLE);
+                play_button.setVisibility(View.VISIBLE);
+                Glide.with(context).load(url.toString()).centerCrop().placeholder(android.R.drawable.editbox_dropdown_light_frame).into(promo_image);
             }else{
-                Category item=(Category)categoriyList.get(position);
-                Intent intent=new Intent(context, CategoriesActivity.class);
-                intent.putExtra("title",item.getName());
-                context.startActivity(intent);
+                promo_image.setVisibility(View.GONE);
+                play_button.setVisibility(View.GONE);
             }
 
+            time_text_view.setText("uongo time");
+            title.setText(StringUpperHelper.doUpperlization(itemModel.getName()));
+            if(itemModel.getDescription().length()>100){
+                description.setText(StringUpperHelper.doUpperlization(itemModel.getDescription().substring(0,98)+"..."));
+            }else{
+                description.setText(StringUpperHelper.doUpperlization(itemModel.getDescription()));
+            }
         }
-    }
 
-    public class NativeAd extends RecyclerView.ViewHolder{
-       public  NativeAd(View view){
-            super(view);
-        }
-    }
 
-    @Override
-    public int getItemViewType(int position) {
-        try{
-            Category item=(Category)categoriyList.get(position);
-            return 0;
-        }catch (Exception ex){
-            return 1;
-        }
     }
 }

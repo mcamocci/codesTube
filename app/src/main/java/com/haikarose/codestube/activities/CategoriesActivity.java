@@ -8,18 +8,30 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.haikarose.codestube.R;
-import com.haikarose.codestube.adapters.SubCatItemAdapter;
+import com.haikarose.codestube.adapters.CategoryItemAdapter;
+import com.haikarose.codestube.pojos.Category;
+import com.haikarose.codestube.pojos.CategoryItem;
 import com.haikarose.codestube.pojos.SubCatItemModel;
+import com.haikarose.codestube.tools.CommonInformation;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
 
+import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 public class CategoriesActivity extends AppCompatActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
-    private SubCatItemAdapter adapter;
+    private CategoryItemAdapter adapter;
     private LinearLayoutManager layoutManager;
     private List<Object> items=new ArrayList<>();
 
@@ -27,16 +39,19 @@ public class CategoriesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
-        getSupportActionBar().setTitle(getIntent().getStringExtra("title"));
+        getSupportActionBar().setTitle(getIntent().getStringExtra(Category.NAME));
 
         swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipeRefresh);
         recyclerView=(RecyclerView)findViewById(R.id.recyclerView);
         layoutManager=new LinearLayoutManager(getBaseContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        populateFakeData(items);
+        String categoryName=getIntent().getStringExtra(Category.NAME);
 
-        adapter=new SubCatItemAdapter(getBaseContext(),items);
+        doTask(CommonInformation.CATEGORY_SUB_ITEMS,0,2,items,categoryName);
+        //populateFakeData(items);
+
+        adapter=new CategoryItemAdapter(getBaseContext(),items);
 
         recyclerView.setAdapter(adapter);
 
@@ -98,5 +113,45 @@ public class CategoriesActivity extends AppCompatActivity {
         }
 
     }
+
+    public void doTask(String url, final int page, int total, final List<Object> categories,String name){
+
+        AsyncHttpClient client=new AsyncHttpClient();
+        RequestParams params=new RequestParams();
+
+        try{
+            url+= URLEncoder.encode(name,"UTF-8");
+        }catch (Exception ex){
+
+        }
+
+
+        client.get(getBaseContext(), url, params, new TextHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+                super.onStart();
+                swipeRefreshLayout.setRefreshing(true);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+
+                swipeRefreshLayout.setRefreshing(false);
+                Type listType = new TypeToken<List<CategoryItem>>() {}.getType();
+                List<CategoryItem> yourList = new Gson().fromJson(responseString, listType);
+                //addNativeAddToList(page,categories);
+                categories.addAll(yourList);
+                adapter.notifyDataSetChanged();
+
+            }
+        });
+    }
+
 
 }

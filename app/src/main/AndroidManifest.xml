@@ -26,7 +26,8 @@
         <activity android:name=".activities.CategoriesActivity" />
         <activity android:name=".activities.AboutActivity" />
         <activity android:name=".activities.MessageActivity" />
-        <activity android:name=".activities.ListOfPlayableItemActivity"></activity>
+        <activity android:name=".activities.ListOfPlayableItemActivity" />
+        <activity android:name=".activities.PostsActivity"></activity>
     </application>
 
 </manifest>

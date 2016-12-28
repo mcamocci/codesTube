@@ -4,18 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.haikarose.codestube.R;
 import com.haikarose.codestube.activities.ListOfPlayableItemActivity;
+import com.haikarose.codestube.pojos.CategoryItem;
+import com.haikarose.codestube.pojos.Post;
 import com.haikarose.codestube.pojos.SubCatItemModel;
+import com.haikarose.codestube.tools.CommonInformation;
 import com.haikarose.codestube.tools.StringUpperHelper;
 
 import java.net.MalformedURLException;
@@ -26,25 +27,25 @@ import java.util.List;
 /**
  * Created by root on 7/29/16.
  */
-public class SubCatItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PostItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     List<Object> list;
     Context context;
 
-    public SubCatItemAdapter(Context context, List<Object> list){
+    public PostItemAdapter(Context context, List<Object> list){
         this.list=list;
         this.context=context;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        SubCatItemModel currentItem=(SubCatItemModel)list.get(position);
+        Post currentItem=(Post)list.get(position);
         ((NotificationViewHolder)holder).setData(currentItem);
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cat_sub,parent,false);
+        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item,parent,false);
         NotificationViewHolder viewHolder=new NotificationViewHolder(view);
         return viewHolder;
     }
@@ -62,9 +63,8 @@ public class SubCatItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         private ImageView promo_image;
         private TextView time_text_view;
-        private TextView title;
+        private TextView categoryItem;
         private TextView description;
-        private LinearLayout play_button;
 
 
 
@@ -73,11 +73,9 @@ public class SubCatItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             this.view=view;
             promo_image=(ImageView) view.findViewById(R.id.promo_image);
             time_text_view=(TextView) view.findViewById(R.id.time);
-            title=(TextView)view.findViewById(R.id.channel_name);
-            description=(TextView)view.findViewById(R.id.message);
+            description=(TextView)view.findViewById(R.id.description);
+            categoryItem=(TextView)view.findViewById(R.id.category_item);
             description.setMovementMethod(LinkMovementMethod.getInstance());
-            play_button=(LinearLayout)view.findViewById(R.id.play_button);
-            play_button.setOnClickListener(this);
 
             view.setOnClickListener(this);
             this.context=view.getContext();
@@ -87,19 +85,19 @@ public class SubCatItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         public void onClick(View v) {
 
            int position=NotificationViewHolder.this.getAdapterPosition();
-           SubCatItemModel item=(SubCatItemModel)list.get(position);
+           Post item=(Post) list.get(position);
            Intent intent=new Intent(NotificationViewHolder.this.context,ListOfPlayableItemActivity.class);
-           intent.putExtras(SubCatItemModel.UpdatesItemToBundle(item));
+           intent.putExtra(CommonInformation.KEY_POST_ID,item.getId());
            NotificationViewHolder.this.context.startActivity(intent);
 
         }
 
         public void setData(Object item){
 
-            SubCatItemModel itemModel=(SubCatItemModel)item;
+            Post itemModel=(Post) item;
             URL url= null;
 
-            if(((SubCatItemModel)item).getTitle().equalsIgnoreCase("ujinga")){
+            if(((Post)item).getContent().equalsIgnoreCase("springboot")){
 
                 try {
                     url = new URL(((SubCatItemModel) item).getPromoImage());
@@ -108,19 +106,17 @@ public class SubCatItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 }
 
                 promo_image.setVisibility(View.VISIBLE);
-                play_button.setVisibility(View.VISIBLE);
                 Glide.with(context).load(url.toString()).centerCrop().placeholder(android.R.drawable.editbox_dropdown_light_frame).into(promo_image);
             }else{
                 promo_image.setVisibility(View.GONE);
-                play_button.setVisibility(View.GONE);
             }
 
             time_text_view.setText("uongo time");
-            title.setText(StringUpperHelper.doUpperlization(itemModel.getTitle()));
-            if(itemModel.getDescription().length()>100){
-                description.setText(StringUpperHelper.doUpperlization(itemModel.getDescription().substring(0,98)+"..."));
+            categoryItem.setText(StringUpperHelper.doUpperlization("not figured"));
+            if(itemModel.getContent().length()>100){
+                description.setText(StringUpperHelper.doUpperlization(itemModel.getContent().substring(0,98)+"..."));
             }else{
-                description.setText(StringUpperHelper.doUpperlization(itemModel.getDescription()));
+                description.setText(StringUpperHelper.doUpperlization(itemModel.getContent()));
             }
         }
 
