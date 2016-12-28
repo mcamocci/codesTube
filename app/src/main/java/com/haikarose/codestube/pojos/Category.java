@@ -4,37 +4,80 @@ package com.haikarose.codestube.pojos;
  * Created by root on 12/21/16.
  */
 
-public class Category {
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-    private String title;
-    private String description;
-    private String time;
+/**
+ *
+ * @author meena
+ */
 
-    public Category(){
+public class Category implements Serializable,Comparable{
 
-    }
-    public Category(String title,String description,String time){
-        this.title=title;
-        this.time=time;
-        this.description=description;
+    private String type;
+    private String name;
+
+    public String getCat_descr() {
+        return cat_descr;
     }
 
-    public void setTitle(String title){
-        this.title=title;
+    public void setCat_descr(String cat_descr) {
+        this.cat_descr = cat_descr;
     }
-    public String getTitle(){
-        return this.title;
+
+    public String getSub_cat_descr() {
+        return sub_cat_descr;
     }
-    public void setTime(String time){
-        this.time=time;
+
+    public void setSub_cat_descr(String sub_cat_descr) {
+        this.sub_cat_descr = sub_cat_descr;
     }
-    public String getTime(){
-        return this.time;
+    private String cat_descr;
+    private String sub_cat_descr;
+    private Long id;
+    private List<Post> post=new ArrayList<>();
+
+    public void setPost(Post post){
+        this.post.add(post);
     }
-    public void setDescription(String description){
-        this.description=description;
+
+    public void setId(Long id){
+        this.id=id;
     }
-    public String getDescription(){
-        return this.description;
+
+    public void setName(String name){
+        this.name=name;
+    }
+
+    public Long getId(){
+        return this.id;
+    }
+
+    public String getType(){
+        return this.type;
+    }
+
+    public void setType(String type){
+        this.type=type;
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public List<Post> getPost(){
+        return this.post;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        //To change body of generated methods, choose Tools | Templates.
+        Category cat=(Category)o;
+        if(cat.getName().equalsIgnoreCase(this.getName())){
+            return 0;
+        }
+        return 1;
+
     }
 }

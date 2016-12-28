@@ -95,7 +95,7 @@ public class CategoryItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         }
 
-       
+
     }
 
     @Override
@@ -125,9 +125,9 @@ public class CategoryItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             moreOption=(ImageView)view.findViewById(R.id.more_menu);
             moreOption.setOnClickListener(CategoryItemViewHolder.this);
 
-            title.setText(this.category.getTitle().toUpperCase());
-            time.setText(this.category.getTime());
-            description.setText(this.category.getDescription());
+            title.setText(this.category.getName());
+            time.setText(this.category.getName());
+            description.setText(this.category.getCat_descr());
 
         }
 
@@ -139,15 +139,13 @@ public class CategoryItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         public void onClick(View v) {
 
             int position=CategoryItemViewHolder.this.getAdapterPosition();
-            Toast.makeText(context,Integer.toString(position),Toast.LENGTH_SHORT).show();
-
             if(v.getId()==R.id.more_menu){
                 MoreOptionDialog dialog=new MoreOptionDialog();
                 dialog.show(fragmentManager,"tag");
             }else{
                 Category item=(Category)categoriyList.get(position);
                 Intent intent=new Intent(context, CategoriesActivity.class);
-                intent.putExtra("title",item.getTitle());
+                intent.putExtra("title",item.getName());
                 context.startActivity(intent);
             }
 
@@ -166,8 +164,6 @@ public class CategoryItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             Category item=(Category)categoriyList.get(position);
             return 0;
         }catch (Exception ex){
-            Log.e("the render probs",Integer.toString(position));
-           // Toast.makeText(context,"failed to render at"+Integer.toString(position),Toast.LENGTH_SHORT).show();
             return 1;
         }
     }

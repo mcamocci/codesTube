@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +20,26 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.NativeExpressAdView;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.haikarose.codestube.R;
 import com.haikarose.codestube.adapters.CategoryItemAdapter;
 import com.haikarose.codestube.pojos.Category;
+import com.haikarose.codestube.tools.CommonInformation;
 import com.haikarose.codestube.tools.EndlessRecyclerViewScrollListener;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
 
+import java.io.File;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -75,8 +89,10 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
         final List<Object> categories=new ArrayList<>();
 
         //page//total//count/list
-        loadData(0,0,categories);
+        //loadData(0,0,categories);
 
+        //the first loading task.
+        doTask(CommonInformation.CATEGORY_LIST,0,2,categories);
 
 
 
@@ -85,10 +101,7 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
 
-                    Toast.makeText(getContext(),Integer.toString(page)+":"+Integer.toString(totalItemsCount),Toast.LENGTH_SHORT).show();
-                    loadData(page,totalItemsCount,categories);
-                    adapter.notifyDataSetChanged();
-                    Toast.makeText(getContext(),"am here",Toast.LENGTH_SHORT).show();
+                   doTask(CommonInformation.CATEGORY_LIST,page,2,categories);
 
             }
         });
@@ -163,11 +176,11 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
 
             for(int i=0;i<7;i++) {
 
-                    Category category = new Category("System Analysis and Design",
-                            "Java programming language is the best Java programming " +
-                                    "language is the best Java programming language is the best " +
-                                    "Java programming language is the best Java programming language " +
-                                    "is the bestJava programming language is the best", "21 dec 2016");
+                    Category category = new Category();
+                    category.setName("System Analysis and Design");
+                    category.setCat_descr("Java programming language is the best Java programming ");
+                    category.setType("Java");
+
                     categories.add(category);
             }
 
@@ -177,11 +190,12 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
 
                  int value=total;
                  for(int i=total;i<value+8;i++){
-                         Category category = new Category("System Analysis and Design",
-                                 "Java programming language is the best Java programming " +
-                                         "language is the best Java programming language is the best " +
-                                         "Java programming language is the best Java programming language " +
-                                         "is the bestJava programming language is the best", "21 dec 2016");
+                         Category category = new Category();
+                         category.setName("System Analysis and Design");
+                         category.setCat_descr("Java programming language is the best Java programming ");
+                         category.setType("Java");
+
+                         categories.add(category);
                          categories.add(category);
                         }
 
@@ -193,4 +207,46 @@ public class Home extends Fragment implements TimePickerDialog.OnTimeSetListener
 
         swipeRefreshLayout.setRefreshing(false);
     }
+
+
+    public void doTask(String url, final int page, int total, final List<Object> categories){
+
+        AsyncHttpClient client=new AsyncHttpClient();
+        RequestParams params=new RequestParams();
+
+        try{
+            url+=URLEncoder.encode(Integer.toString(page),"UTF-8")+"/"+URLEncoder.encode(Integer.toString(total),"UTF-8");
+        }catch (Exception ex){
+
+        }
+
+
+        client.get(getContext(), url, params, new TextHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+                super.onStart();
+                swipeRefreshLayout.setRefreshing(true);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Toast.makeText(getContext(),responseString,Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+
+                swipeRefreshLayout.setRefreshing(false);
+                    Type listType = new TypeToken<List<Category>>() {}.getType();
+                    List<Category> yourList = new Gson().fromJson(responseString, listType);
+                    addNativeAddToList(page,categories);
+                    categories.addAll(yourList);
+                    adapter.notifyDataSetChanged();
+
+            }
+        });
+    }
+
 }

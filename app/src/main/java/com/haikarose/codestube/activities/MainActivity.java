@@ -36,9 +36,9 @@ public class MainActivity extends FragmentActivity implements TimePickerDialog.O
         button=(Button)findViewById(R.id.button);
 
 
-        NiceSpinner niceSpinner = (NiceSpinner) findViewById(R.id.spinner);
+        /*NiceSpinner niceSpinner = (NiceSpinner) findViewById(R.id.spinner);
         List<String> dataset = new LinkedList<>(Arrays.asList("One", "Two", "Three", "Four", "Five"));
-        niceSpinner.attachDataSource(dataset);
+        niceSpinner.attachDataSource(dataset);*/
         button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
 
